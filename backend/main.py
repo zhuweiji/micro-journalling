@@ -7,6 +7,12 @@ import schemas
 import database
 from database import Base, engine
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
+log = logging.getLogger(__name__)
+
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
@@ -112,6 +118,7 @@ def delete_entry(entry_id: int, db: Session = Depends(get_db)):
     Returns:
         Success message
     """
+    log.info(f"Deleting entry with ID: {entry_id}")
     models.delete_journal_entry(db, entry_id)
     return {"message": "Entry deleted successfully"}
 

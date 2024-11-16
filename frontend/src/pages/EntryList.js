@@ -28,6 +28,7 @@ function EntryList() {
     try {
       setLoading(true);
       const response = await axios.get(`http://localhost:8000/entries/?page=${page}&page_size=${pageSize}`);
+      console.log(response.data)
       setEntries(response.data.items);
       setTotal(response.data.total);
       setHasMore(response.data.has_more);
