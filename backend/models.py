@@ -75,8 +75,9 @@ def get_entries_by_date_range(db: Session, start_date: str, end_date: str):
     Returns:
         Dictionary of entries mapped to dates
     """
-    start = datetime.fromisoformat(start_date)
-    end = datetime.fromisoformat(end_date)
+    # Parse the dates and set time to start/end of day
+    start = datetime.fromisoformat(start_date).replace(hour=0, minute=0, second=0, microsecond=0)
+    end = datetime.fromisoformat(end_date).replace(hour=23, minute=59, second=59, microsecond=999999)
     
     entries = db.query(JournalEntry).filter(
         JournalEntry.created_at.between(start, end)

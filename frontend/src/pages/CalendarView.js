@@ -16,7 +16,8 @@ import WeekView from '../components/calendar/WeekView';
 function CalendarView() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [entries, setEntries] = useState({});
-  const [viewMode, setViewMode] = useState('month'); // 'month' or 'week'
+  const [viewMode, setViewMode] = useState('month');
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
     const fetchEntries = async () => {
@@ -34,9 +35,7 @@ function CalendarView() {
       );
       
       try {
-        console.log(start, end)
         const response = await axios.get(`http://localhost:8000/entries/calendar/?start_date=${start}&end_date=${end}`);
-        console.log(response.data)
         setEntries(response.data);
       } catch (error) {
         console.error('Error fetching entries:', error);
@@ -76,6 +75,12 @@ function CalendarView() {
     setCurrentDate(newDate);
   };
 
+  const handleDateClick = (date) => {
+    setSelectedDate(date);
+    setCurrentDate(date);
+    setViewMode('week');
+  };
+
   return (
     <div className="max-w-6xl mx-auto bg-white p-4 sm:p-8 rounded-xl shadow-md min-h-[calc(100vh-6rem)]">
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
@@ -101,7 +106,12 @@ function CalendarView() {
         
         <select
           value={viewMode}
-          onChange={(e) => setViewMode(e.target.value)}
+          onChange={(e) => {
+            setViewMode(e.target.value);
+            if (e.target.value === 'month') {
+              setSelectedDate(null);
+            }
+          }}
           className="w-full sm:w-auto px-3 py-1 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value="month">Month View</option>
@@ -114,11 +124,13 @@ function CalendarView() {
           days={getDaysToRender()} 
           entries={entries} 
           currentDate={currentDate}
+          onDateClick={handleDateClick}
         />
       ) : (
         <WeekView 
           days={getDaysToRender()} 
           entries={entries}
+          selectedDate={selectedDate}
         />
       )}
     </div>

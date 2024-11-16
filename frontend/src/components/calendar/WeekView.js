@@ -1,19 +1,33 @@
-import React from 'react';
-import { format } from 'date-fns';
+import React, { useEffect, useRef } from 'react';
+import { format, isSameDay } from 'date-fns';
 
-function WeekView({ days, entries }) {
+function WeekView({ days, entries, selectedDate }) {
+  const selectedDayRef = useRef(null);
+
+  useEffect(() => {
+    if (selectedDate && selectedDayRef.current) {
+      selectedDayRef.current.scrollIntoView({ 
+        behavior: 'smooth',
+        block: 'center'
+      });
+    }
+  }, [selectedDate]);
+
   return (
     <div className="grid gap-2 grid-cols-1 sm:grid-cols-7">
       {days.map(day => {
         const dateString = format(day, 'yyyy-MM-dd');
         const hasEntry = entries[dateString] && entries[dateString].length > 0;
+        const isSelected = selectedDate && isSameDay(day, selectedDate);
         
         return (
           <div 
-            key={dateString} 
+            key={dateString}
+            ref={isSelected ? selectedDayRef : null}
             className={`
               p-4 border rounded-lg
               ${hasEntry ? 'bg-blue-50 border-blue-300' : 'bg-white border-gray-200'}
+              ${isSelected ? 'ring-2 ring-blue-500' : ''}
               hover:bg-blue-100 transition duration-200
             `}
           >
