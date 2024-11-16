@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import axios from 'axios';
 
 function DailyEntry() {
-  const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
   const [mood, setMood] = useState('');
 
@@ -10,13 +9,11 @@ function DailyEntry() {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:8000/entries/', {
-        title,
         content,
         mood
       });
       
       // Reset form after successful submission
-      setTitle('');
       setContent('');
       setMood('');
       
@@ -35,34 +32,16 @@ function DailyEntry() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label 
-            htmlFor="title" 
-            className="block text-sm font-medium text-gray-700 mb-2"
-          >
-            Entry Title
-          </label>
-          <input
-            type="text"
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="What's on your mind?"
-            required
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        
-        <div>
-          <label 
             htmlFor="content" 
             className="block text-sm font-medium text-gray-700 mb-2"
           >
-            Journal Entry
+            What's on your mind today?
           </label>
           <textarea
             id="content"
             value={content}
             onChange={(e) => setContent(e.target.value)}
-            rows={6}
+            rows={8}
             placeholder="Write your thoughts here..."
             required
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

@@ -6,7 +6,6 @@ class JournalEntryBase(BaseModel):
     """
     Base schema for journal entries
     """
-    title: str
     content: str
     mood: Optional[str] = None
 

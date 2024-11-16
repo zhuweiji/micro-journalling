@@ -11,7 +11,6 @@ class JournalEntry(database.Base):
     __tablename__ = "journal_entries"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, nullable=False)
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     mood = Column(String, nullable=True)
@@ -28,7 +27,6 @@ def create_journal_entry(db: Session, entry: schemas.JournalEntryCreate):
         Created journal entry
     """
     db_entry = JournalEntry(
-        title=entry.title, 
         content=entry.content,
         mood=entry.mood
     )
