@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime
 import database
 import schemas
+from fastapi import HTTPException
 
 class JournalEntry(database.Base):
     """
@@ -92,3 +93,26 @@ def get_entries_by_date_range(db: Session, start_date: str, end_date: str):
         entries_by_date[date_key].append(entry)
     
     return entries_by_date
+
+def update_journal_entry(db: Session, entry_id: int, entry: schemas.JournalEntryCreate):
+    """Update an existing journal entry"""
+    db_entry = db.query(JournalEntry).filter(JournalEntry.id == entry_id).first()
+    if not db_entry:
+        raise HTTPException(status_code=404, detail="Entry not found")
+    
+    for key, value in entry.dict().items():
+        setattr(db_entry, key, value)
+    
+    db.commit()
+    db.refresh(db_entry)
+    return db_entry
+
+def delete_journal_entry(db: Session, entry_id: int):
+    """Delete a journal entry"""
+    db_entry = db.query(JournalEntry).filter(JournalEntry.id == entry_id).first()
+    if not db_entry:
+        raise HTTPException(status_code=404, detail="Entry not found")
+    
+    db.delete(db_entry)
+    db.commit()
+    return True

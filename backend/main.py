@@ -50,10 +50,17 @@ def read_entries(
     db: Session = Depends(get_db)
 ):
     """
-    Retrieve journal entries with pagination
+    Retrieve paginated journal entries
+    
+    Args:
+        page (int): Page number
+        page_size (int): Number of entries per page
+        db (Session): Database session
+    
+    Returns:
+        Paginated list of journal entries
     """
-    skip = (page - 1) * page_size
-    return models.get_journal_entries(db, skip=skip, limit=page_size)
+    return models.get_journal_entries(db, skip=(page - 1) * page_size, limit=page_size)
 
 @app.get("/entries/calendar/")
 def get_calendar_entries(
@@ -73,6 +80,40 @@ def get_calendar_entries(
         Dictionary of entries mapped to dates
     """
     return models.get_entries_by_date_range(db, start_date, end_date)
+
+@app.put("/entries/{entry_id}", response_model=schemas.JournalEntry)
+def update_entry(
+    entry_id: int,
+    entry: schemas.JournalEntryCreate,
+    db: Session = Depends(get_db)
+):
+    """
+    Update a journal entry
+    
+    Args:
+        entry_id (int): ID of the entry to update
+        entry (JournalEntryCreate): Updated entry details
+        db (Session): Database session
+    
+    Returns:
+        Updated journal entry
+    """
+    return models.update_journal_entry(db, entry_id, entry)
+
+@app.delete("/entries/{entry_id}")
+def delete_entry(entry_id: int, db: Session = Depends(get_db)):
+    """
+    Delete a journal entry
+    
+    Args:
+        entry_id (int): ID of the entry to delete
+        db (Session): Database session
+    
+    Returns:
+        Success message
+    """
+    models.delete_journal_entry(db, entry_id)
+    return {"message": "Entry deleted successfully"}
 
 if __name__ == "__main__":
     import uvicorn
