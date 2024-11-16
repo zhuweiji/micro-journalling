@@ -1,18 +1,42 @@
 import React, { useState, useEffect } from 'react';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, parseISO } from 'date-fns';
+import { 
+  format, 
+  startOfMonth, 
+  endOfMonth, 
+  eachDayOfInterval, 
+  startOfWeek,
+  endOfWeek,
+  addWeeks,
+  subWeeks
+} from 'date-fns';
 import axios from 'axios';
+import MonthView from '../components/calendar/MonthView';
+import WeekView from '../components/calendar/WeekView';
 
 function CalendarView() {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [entries, setEntries] = useState({});
+  const [viewMode, setViewMode] = useState('month'); // 'month' or 'week'
 
   useEffect(() => {
     const fetchEntries = async () => {
-      const start = format(startOfMonth(currentMonth), 'yyyy-MM-dd');
-      const end = format(endOfMonth(currentMonth), 'yyyy-MM-dd');
+      const start = format(
+        viewMode === 'month' 
+          ? startOfMonth(currentDate)
+          : startOfWeek(currentDate, { weekStartsOn: 0 }),
+        'yyyy-MM-dd'
+      );
+      const end = format(
+        viewMode === 'month'
+          ? endOfMonth(currentDate)
+          : endOfWeek(currentDate, { weekStartsOn: 0 }),
+        'yyyy-MM-dd'
+      );
       
       try {
+        console.log(start, end)
         const response = await axios.get(`http://localhost:8000/entries/calendar/?start_date=${start}&end_date=${end}`);
+        console.log(response.data)
         setEntries(response.data);
       } catch (error) {
         console.error('Error fetching entries:', error);
@@ -20,75 +44,83 @@ function CalendarView() {
     };
 
     fetchEntries();
-  }, [currentMonth]);
+  }, [currentDate, viewMode]);
 
-  const daysInMonth = eachDayOfInterval({
-    start: startOfMonth(currentMonth),
-    end: endOfMonth(currentMonth)
-  });
-
-  const renderCalendar = () => {
-    return (
-      <div className="grid grid-cols-7 gap-2">
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <div key={day} className="text-center font-bold text-gray-600">{day}</div>
-        ))}
-        
-        {daysInMonth.map(day => {
-          const dateString = format(day, 'yyyy-MM-dd');
-          const hasEntry = entries[dateString] && entries[dateString].length > 0;
-          
-          return (
-            <div 
-              key={dateString} 
-              className={`
-                p-2 border rounded-md text-center 
-                ${hasEntry ? 'bg-blue-100 border-blue-300' : 'bg-gray-100 border-gray-300'}
-                hover:bg-blue-200 transition duration-200
-              `}
-            >
-              <span className="text-sm">{format(day, 'd')}</span>
-              {hasEntry && (
-                <div className="text-xs text-blue-700 mt-1">
-                  {entries[dateString].length} entry/entries
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    );
+  const getDaysToRender = () => {
+    if (viewMode === 'month') {
+      return eachDayOfInterval({
+        start: startOfMonth(currentDate),
+        end: endOfMonth(currentDate)
+      });
+    } else {
+      return eachDayOfInterval({
+        start: startOfWeek(currentDate, { weekStartsOn: 0 }),
+        end: endOfWeek(currentDate, { weekStartsOn: 0 })
+      });
+    }
   };
 
-  const changeMonth = (direction) => {
-    const newMonth = new Date(currentMonth);
-    newMonth.setMonth(newMonth.getMonth() + direction);
-    setCurrentMonth(newMonth);
+  const navigate = (direction) => {
+    const newDate = new Date(currentDate);
+    if (viewMode === 'month') {
+      newDate.setMonth(newDate.getMonth() + direction);
+    } else {
+      if (direction === 1) {
+        setCurrentDate(addWeeks(currentDate, 1));
+        return;
+      } else {
+        setCurrentDate(subWeeks(currentDate, 1));
+        return;
+      }
+    }
+    setCurrentDate(newDate);
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-md">
-      <div className="flex justify-between items-center mb-6">
-        <button 
-          onClick={() => changeMonth(-1)}
-          className="text-gray-600 hover:text-gray-900"
-        >
-          ← Previous
-        </button>
+    <div className="max-w-6xl mx-auto bg-white p-4 sm:p-8 rounded-xl shadow-md min-h-[calc(100vh-6rem)]">
+      <div className="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
+        <div className="flex items-center justify-between w-full sm:w-auto gap-4">
+          <button 
+            onClick={() => navigate(-1)}
+            className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition duration-200"
+          >
+            ← Previous
+          </button>
+          
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center">
+            {format(currentDate, viewMode === 'month' ? 'MMMM yyyy' : "'Week of' MMM d")}
+          </h2>
+          
+          <button 
+            onClick={() => navigate(1)}
+            className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition duration-200"
+          >
+            Next →
+          </button>
+        </div>
         
-        <h2 className="text-2xl font-bold text-gray-800">
-          {format(currentMonth, 'MMMM yyyy')}
-        </h2>
-        
-        <button 
-          onClick={() => changeMonth(1)}
-          className="text-gray-600 hover:text-gray-900"
+        <select
+          value={viewMode}
+          onChange={(e) => setViewMode(e.target.value)}
+          className="w-full sm:w-auto px-3 py-1 border rounded-md text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          Next →
-        </button>
+          <option value="month">Month View</option>
+          <option value="week">Week View</option>
+        </select>
       </div>
       
-      {renderCalendar()}
+      {viewMode === 'month' ? (
+        <MonthView 
+          days={getDaysToRender()} 
+          entries={entries} 
+          currentDate={currentDate}
+        />
+      ) : (
+        <WeekView 
+          days={getDaysToRender()} 
+          entries={entries}
+        />
+      )}
     </div>
   );
 }
