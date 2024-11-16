@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 
 class JournalEntryBase(BaseModel):
     """
@@ -21,6 +21,19 @@ class JournalEntry(JournalEntryBase):
     """
     id: int
     created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+class PaginatedJournalEntries(BaseModel):
+    """
+    Schema for paginated journal entries response
+    """
+    items: List[JournalEntry]
+    total: int
+    page: int
+    size: int
+    has_more: bool
 
     class Config:
         orm_mode = True

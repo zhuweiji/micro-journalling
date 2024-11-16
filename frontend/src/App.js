@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import DailyEntry from './pages/DailyEntry';
 import CalendarView from './pages/CalendarView';
+import EntryList from './pages/EntryList';
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
           <Routes>
             <Route path="/" element={<DailyEntry />} />
             <Route path="/calendar" element={<CalendarView />} />
+            <Route path="/entries" element={<EntryList />} />
           </Routes>
         </div>
       </div>

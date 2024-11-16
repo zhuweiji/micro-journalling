@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime
+from sqlalchemy import Column, Integer, String, Text, DateTime, func
 from sqlalchemy.orm import Session
 from datetime import datetime
 import database
@@ -35,7 +35,7 @@ def create_journal_entry(db: Session, entry: schemas.JournalEntryCreate):
     db.refresh(db_entry)
     return db_entry
 
-def get_journal_entries(db: Session, skip: int = 0, limit: int = 100):
+def get_journal_entries(db: Session, skip: int = 0, limit: int = 10):
     """
     Retrieve journal entries with pagination
     
@@ -47,9 +47,21 @@ def get_journal_entries(db: Session, skip: int = 0, limit: int = 100):
     Returns:
         List of journal entries
     """
-    return db.query(JournalEntry).order_by(
+    total = db.query(func.count(JournalEntry.id)).scalar()
+    entries = db.query(JournalEntry).order_by(
         JournalEntry.created_at.desc()
-    ).offset(skip).limit(limit).all()
+    ).offset(skip).limit(limit + 1).all()
+    
+    has_more = len(entries) > limit
+    entries = entries[:limit]
+    
+    return {
+        "items": entries,
+        "total": total,
+        "page": skip // limit + 1,
+        "size": limit,
+        "has_more": has_more
+    }
 
 def get_entries_by_date_range(db: Session, start_date: str, end_date: str):
     """

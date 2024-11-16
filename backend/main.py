@@ -43,25 +43,17 @@ def create_entry(entry: schemas.JournalEntryCreate, db: Session = Depends(get_db
     """
     return models.create_journal_entry(db, entry)
 
-@app.get("/entries/", response_model=List[schemas.JournalEntry])
+@app.get("/entries/", response_model=schemas.PaginatedJournalEntries)
 def read_entries(
-    skip: int = 0, 
-    limit: int = 100, 
+    page: int = 1,
+    page_size: int = 10,
     db: Session = Depends(get_db)
 ):
     """
     Retrieve journal entries with pagination
-    
-    Args:
-        skip (int): Number of entries to skip
-        limit (int): Maximum number of entries to return
-        db (Session): Database session
-    
-    Returns:
-        List of journal entries
     """
-    entries = models.get_journal_entries(db, skip=skip, limit=limit)
-    return entries
+    skip = (page - 1) * page_size
+    return models.get_journal_entries(db, skip=skip, limit=page_size)
 
 @app.get("/entries/calendar/")
 def get_calendar_entries(
