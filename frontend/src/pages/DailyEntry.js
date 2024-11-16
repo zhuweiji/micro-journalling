@@ -3,6 +3,7 @@ import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import useWindowSize from 'react-use/lib/useWindowSize';
 import Confetti from 'react-confetti';
+const { REACT_APP_API_URL } = process.env;
 
 function DailyEntry() {
   const [content, setContent] = useState('');
@@ -13,15 +14,15 @@ function DailyEntry() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:8000/entries/', {
+      await axios.post(`${REACT_APP_API_URL}}/entries/`, {
         content,
         mood
       });
-      
+
       // Reset form
       setContent('');
       setMood('');
-      
+
       // Show success toast and confetti
       toast.success('Journal entry saved! 📝', {
         duration: 3000,
@@ -38,7 +39,7 @@ function DailyEntry() {
       // Trigger confetti
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
-      
+
     } catch (error) {
       console.error('Error saving journal entry:', error);
       toast.error('Failed to save journal entry', {
@@ -73,8 +74,8 @@ function DailyEntry() {
         </h1>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label 
-              htmlFor="content" 
+            <label
+              htmlFor="content"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
               What's on your mind today?
@@ -89,10 +90,10 @@ function DailyEntry() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          
+
           <div>
-            <label 
-              htmlFor="mood" 
+            <label
+              htmlFor="mood"
               className="block text-sm font-medium text-gray-700 mb-2"
             >
               Today's Mood
@@ -111,7 +112,7 @@ function DailyEntry() {
               <option value="stressed">Stressed 😓</option>
             </select>
           </div>
-          
+
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-3 rounded-md hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-101 focus:outline-none focus:ring-2 focus:ring-blue-500"

@@ -7,7 +7,7 @@ SQLALCHEMY_DATABASE_URL = "sqlite:///./journal.db"
 
 # Create SQLAlchemy engine
 engine = create_engine(
-    SQLALCHEMY_DATABASE_URL, 
+    SQLALCHEMY_DATABASE_URL,
     connect_args={"check_same_thread": False}  # Only for SQLite
 )
 

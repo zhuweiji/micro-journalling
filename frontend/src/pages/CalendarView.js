@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  format, 
-  startOfMonth, 
-  endOfMonth, 
-  eachDayOfInterval, 
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
   startOfWeek,
   endOfWeek,
   addWeeks,
@@ -12,6 +12,7 @@ import {
 import axios from 'axios';
 import MonthView from '../components/calendar/MonthView';
 import WeekView from '../components/calendar/WeekView';
+const { REACT_APP_API_URL } = process.env;
 
 function CalendarView() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -22,7 +23,7 @@ function CalendarView() {
   useEffect(() => {
     const fetchEntries = async () => {
       const start = format(
-        viewMode === 'month' 
+        viewMode === 'month'
           ? startOfMonth(currentDate)
           : startOfWeek(currentDate, { weekStartsOn: 0 }),
         'yyyy-MM-dd'
@@ -33,9 +34,9 @@ function CalendarView() {
           : endOfWeek(currentDate, { weekStartsOn: 0 }),
         'yyyy-MM-dd'
       );
-      
+
       try {
-        const response = await axios.get(`http://localhost:8000/entries/calendar/?start_date=${start}&end_date=${end}`);
+        const response = await axios.get(`${REACT_APP_API_URL}/entries/calendar/?start_date=${start}&end_date=${end}`);
         setEntries(response.data);
       } catch (error) {
         console.error('Error fetching entries:', error);
@@ -85,25 +86,25 @@ function CalendarView() {
     <div className="max-w-6xl mx-auto bg-white p-4 sm:p-8 rounded-xl shadow-md min-h-[calc(100vh-6rem)]">
       <div className="flex flex-col sm:flex-row justify-between items-center mb-6 space-y-4 sm:space-y-0">
         <div className="flex items-center justify-between w-full sm:w-auto gap-4">
-          <button 
+          <button
             onClick={() => navigate(-1)}
             className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition duration-200"
           >
             ← Previous
           </button>
-          
+
           <h2 className="text-xl sm:text-2xl font-bold text-gray-800 text-center">
             {format(currentDate, viewMode === 'month' ? 'MMMM yyyy' : "'Week of' MMM d")}
           </h2>
-          
-          <button 
+
+          <button
             onClick={() => navigate(1)}
             className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition duration-200"
           >
             Next →
           </button>
         </div>
-        
+
         <select
           value={viewMode}
           onChange={(e) => {
@@ -118,17 +119,17 @@ function CalendarView() {
           <option value="week">Week View</option>
         </select>
       </div>
-      
+
       {viewMode === 'month' ? (
-        <MonthView 
-          days={getDaysToRender()} 
-          entries={entries} 
+        <MonthView
+          days={getDaysToRender()}
+          entries={entries}
           currentDate={currentDate}
           onDateClick={handleDateClick}
         />
       ) : (
-        <WeekView 
-          days={getDaysToRender()} 
+        <WeekView
+          days={getDaysToRender()}
           entries={entries}
           selectedDate={selectedDate}
         />

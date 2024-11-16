@@ -3,6 +3,7 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import toast, { Toaster } from 'react-hot-toast';
 import { FaEdit, FaTrash } from 'react-icons/fa';
+const { REACT_APP_API_URL } = process.env;
 
 const MoodEmoji = ({ mood }) => {
   const emojis = {
@@ -27,7 +28,7 @@ function EntryList() {
   const fetchEntries = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`http://localhost:8000/entries/?page=${page}&page_size=${pageSize}`);
+      const response = await axios.get(`${REACT_APP_API_URL}/entries/?page=${page}&page_size=${pageSize}`);
       console.log(response.data)
       setEntries(response.data.items);
       setTotal(response.data.total);
@@ -62,15 +63,15 @@ function EntryList() {
 
   const handleUpdate = async () => {
     try {
-      await axios.put(`http://localhost:8000/entries/${editingEntry.id}`, {
+      await axios.put(`${REACT_APP_API_URL}/entries/${editingEntry.id}`, {
         content: editingEntry.content,
         mood: editingEntry.mood
       });
-      
-      setEntries(entries.map(entry => 
+
+      setEntries(entries.map(entry =>
         entry.id === editingEntry.id ? editingEntry : entry
       ));
-      
+
       setEditingEntry(null);
       toast.success('Entry updated successfully! ✏️');
     } catch (error) {
@@ -82,7 +83,7 @@ function EntryList() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this entry?')) {
       try {
-        await axios.delete(`http://localhost:8000/entries/${id}`);
+        await axios.delete(`${REACT_APP_API_URL}/entries/${id}`);
         setEntries(entries.filter(entry => entry.id !== id));
         toast.success('Entry deleted successfully! 🗑️');
       } catch (error) {
@@ -98,7 +99,7 @@ function EntryList() {
       <h1 className="text-3xl font-bold mb-8 text-gray-800">
         Journal Entries
       </h1>
-      
+
       {loading ? (
         <div className="flex justify-center items-center py-8">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
@@ -107,7 +108,7 @@ function EntryList() {
         <>
           <div className="space-y-6">
             {entries.map((entry) => (
-              <div 
+              <div
                 key={entry.id}
                 className="bg-gray-50 p-6 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors duration-200 relative"
               >
@@ -192,11 +193,10 @@ function EntryList() {
             <button
               onClick={handlePrevPage}
               disabled={page === 1}
-              className={`px-4 py-2 rounded-md ${
-                page === 1
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-blue-500 text-white hover:bg-blue-600'
-              }`}
+              className={`px-4 py-2 rounded-md ${page === 1
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
             >
               Previous
             </button>
@@ -206,11 +206,10 @@ function EntryList() {
             <button
               onClick={handleNextPage}
               disabled={!hasMore}
-              className={`px-4 py-2 rounded-md ${
-                !hasMore
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                  : 'bg-blue-500 text-white hover:bg-blue-600'
-              }`}
+              className={`px-4 py-2 rounded-md ${!hasMore
+                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                : 'bg-blue-500 text-white hover:bg-blue-600'
+                }`}
             >
               Next
             </button>

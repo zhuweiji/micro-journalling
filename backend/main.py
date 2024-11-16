@@ -1,13 +1,14 @@
-from fastapi import FastAPI, Depends, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
+import logging
 from typing import List
+
 import models
 import schemas
+from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+
 import database
 from database import Base, engine
-
-import logging
 
 logging.basicConfig(level=logging.INFO)
 
@@ -21,11 +22,15 @@ app = FastAPI(title="Daily Journal App")
 # CORS middleware to allow frontend communication
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Frontend URL
+    allow_origins=[
+        "http://localhost:3000", "https://journal.zhuhome.work",
+        "https://www.journal.zhuhome.work"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # Dependency to get database session
 def get_db():
@@ -35,8 +40,10 @@ def get_db():
     finally:
         db.close()
 
+
 @app.post("/entries/", response_model=schemas.JournalEntry)
-def create_entry(entry: schemas.JournalEntryCreate, db: Session = Depends(get_db)):
+def create_entry(entry: schemas.JournalEntryCreate,
+                 db: Session = Depends(get_db)):
     """
     Create a new journal entry
     
@@ -49,12 +56,11 @@ def create_entry(entry: schemas.JournalEntryCreate, db: Session = Depends(get_db
     """
     return models.create_journal_entry(db, entry)
 
+
 @app.get("/entries/", response_model=schemas.PaginatedJournalEntries)
-def read_entries(
-    page: int = 1,
-    page_size: int = 10,
-    db: Session = Depends(get_db)
-):
+def read_entries(page: int = 1,
+                 page_size: int = 10,
+                 db: Session = Depends(get_db)):
     """
     Retrieve paginated journal entries
     
@@ -66,14 +72,15 @@ def read_entries(
     Returns:
         Paginated list of journal entries
     """
-    return models.get_journal_entries(db, skip=(page - 1) * page_size, limit=page_size)
+    return models.get_journal_entries(db,
+                                      skip=(page - 1) * page_size,
+                                      limit=page_size)
+
 
 @app.get("/entries/calendar/")
-def get_calendar_entries(
-    start_date: str, 
-    end_date: str, 
-    db: Session = Depends(get_db)
-):
+def get_calendar_entries(start_date: str,
+                         end_date: str,
+                         db: Session = Depends(get_db)):
     """
     Retrieve entries for a specific date range (calendar view)
     
@@ -87,12 +94,11 @@ def get_calendar_entries(
     """
     return models.get_entries_by_date_range(db, start_date, end_date)
 
+
 @app.put("/entries/{entry_id}", response_model=schemas.JournalEntry)
-def update_entry(
-    entry_id: int,
-    entry: schemas.JournalEntryCreate,
-    db: Session = Depends(get_db)
-):
+def update_entry(entry_id: int,
+                 entry: schemas.JournalEntryCreate,
+                 db: Session = Depends(get_db)):
     """
     Update a journal entry
     
@@ -105,6 +111,7 @@ def update_entry(
         Updated journal entry
     """
     return models.update_journal_entry(db, entry_id, entry)
+
 
 @app.delete("/entries/{entry_id}")
 def delete_entry(entry_id: int, db: Session = Depends(get_db)):
@@ -121,6 +128,7 @@ def delete_entry(entry_id: int, db: Session = Depends(get_db)):
     log.info(f"Deleting entry with ID: {entry_id}")
     models.delete_journal_entry(db, entry_id)
     return {"message": "Entry deleted successfully"}
+
 
 if __name__ == "__main__":
     import uvicorn
