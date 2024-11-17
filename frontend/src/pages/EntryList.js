@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { format } from 'date-fns';
 import toast, { Toaster } from 'react-hot-toast';
 import { FaEdit, FaTrash } from 'react-icons/fa';
-const { REACT_APP_API_URL } = process.env;
+import { api } from '../context/AuthContext';
 
 const MoodEmoji = ({ mood }) => {
   const emojis = {
@@ -28,7 +27,7 @@ function EntryList() {
   const fetchEntries = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${REACT_APP_API_URL}/entries/?page=${page}&page_size=${pageSize}`);
+      const response = await api.get(`/entries/?page=${page}&page_size=${pageSize}`);
       console.log(response.data)
       setEntries(response.data.items);
       setTotal(response.data.total);
@@ -63,7 +62,7 @@ function EntryList() {
 
   const handleUpdate = async () => {
     try {
-      await axios.put(`${REACT_APP_API_URL}/entries/${editingEntry.id}`, {
+      await api.put(`/entries/${editingEntry.id}`, {
         content: editingEntry.content,
         mood: editingEntry.mood
       });
@@ -83,7 +82,7 @@ function EntryList() {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this entry?')) {
       try {
-        await axios.delete(`${REACT_APP_API_URL}/entries/${id}`);
+        await api.delete(`/entries/${id}`);
         setEntries(entries.filter(entry => entry.id !== id));
         toast.success('Entry deleted successfully! 🗑️');
       } catch (error) {

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, DateTime, func
+from sqlalchemy import Column, Integer, String, Text, DateTime, func, Boolean
 from sqlalchemy.orm import Session
 from datetime import datetime
 import database
@@ -15,6 +15,15 @@ class JournalEntry(database.Base):
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     mood = Column(String, nullable=True)
+
+class User(database.Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 def create_journal_entry(db: Session, entry: schemas.JournalEntryCreate):
     """

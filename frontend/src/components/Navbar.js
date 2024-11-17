@@ -1,44 +1,56 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
-function Navbar() {
-  const location = useLocation();
+const Navbar = () => {
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
 
-  const isActive = (path) => {
-    return location.pathname === path ? 'text-blue-600 font-medium' : 'text-gray-600';
-  };
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
 
-  return (
-    <nav className="bg-white shadow-md">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex flex-wrap justify-between items-center gap-x-4 gap-y-2">
-          <Link to="/" className="text-xl sm:text-2xl font-bold text-gray-800 hover:text-gray-600 whitespace-nowrap">
-            Daily Journal
-          </Link>
-          <div className="flex items-center gap-4 sm:gap-6 text-sm sm:text-base">
-            <Link 
-              to="/" 
-              className={`${isActive('/')} hover:text-gray-900 transition duration-300 whitespace-nowrap`}
-            >
-              New Entry
-            </Link>
-            <Link 
-              to="/entries" 
-              className={`${isActive('/entries')} hover:text-gray-900 transition duration-300 whitespace-nowrap`}
-            >
-              Past Entries
-            </Link>
-            <Link 
-              to="/calendar" 
-              className={`${isActive('/calendar')} hover:text-gray-900 transition duration-300 whitespace-nowrap`}
-            >
-              Calendar
-            </Link>
-          </div>
-        </div>
-      </div>
-    </nav>
-  );
-}
+    return (
+        <nav className="bg-gray-800">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex items-center justify-between h-16">
+                    <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                            <span className="text-white font-bold text-xl">Journal App</span>
+                        </div>
+                        <div className="">
+                            <div className="ml-10 flex items-baseline space-x-4">
+                                <Link
+                                    to="/entries"
+                                    className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                                >
+                                    Entries
+                                </Link>
+                                <Link
+                                    to="/calendar"
+                                    className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                                >
+                                    Calendar
+                                </Link>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="hidden md:block">
+                        <div className="ml-4 flex items-center md:ml-6">
+                            <span className="text-gray-300 mr-4">Welcome, {user?.username}</span>
+                            <button
+                                onClick={handleLogout}
+                                className="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                            >
+                                Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    );
+};
 
 export default Navbar;

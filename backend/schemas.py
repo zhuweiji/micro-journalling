@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional, List
+from typing import Optional, List, Union
 
 class JournalEntryBase(BaseModel):
     """
@@ -34,6 +34,27 @@ class PaginatedJournalEntries(BaseModel):
     page: int
     size: int
     has_more: bool
+
+    class Config:
+        orm_mode = True
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: Union[str, None] = None
+
+class UserBase(BaseModel):
+    username: str
+
+class UserCreate(UserBase):
+    password: str
+
+class User(UserBase):
+    id: int
+    is_active: bool
+    created_at: datetime
 
     class Config:
         orm_mode = True

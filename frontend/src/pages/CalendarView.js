@@ -9,10 +9,9 @@ import {
   addWeeks,
   subWeeks
 } from 'date-fns';
-import axios from 'axios';
 import MonthView from '../components/calendar/MonthView';
 import WeekView from '../components/calendar/WeekView';
-const { REACT_APP_API_URL } = process.env;
+import { api } from '../context/AuthContext';
 
 function CalendarView() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -36,8 +35,7 @@ function CalendarView() {
       );
 
       try {
-        console.log(REACT_APP_API_URL)
-        const response = await axios.get(`${REACT_APP_API_URL}/entries/calendar/?start_date=${start}&end_date=${end}`);
+        const response = await api.get(`/entries/calendar/?start_date=${start}&end_date=${end}`);
         setEntries(response.data);
       } catch (error) {
         console.error('Error fetching entries:', error);

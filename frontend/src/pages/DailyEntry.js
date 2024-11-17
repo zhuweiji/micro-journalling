@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 import useWindowSize from 'react-use/lib/useWindowSize';
 import Confetti from 'react-confetti';
-const { REACT_APP_API_URL } = process.env;
+import { api } from '../context/AuthContext';
 
 function DailyEntry() {
   const [content, setContent] = useState('');
@@ -14,7 +13,7 @@ function DailyEntry() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${REACT_APP_API_URL}/entries/`, {
+      await api.post(`/entries/`, {
         content,
         mood
       });
