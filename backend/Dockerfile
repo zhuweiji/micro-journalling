@@ -5,13 +5,12 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copy the backend requirements
-COPY pyproject.toml README.md ./
+COPY pyproject.toml README.md requirements.txt ./
 
 # Install build dependencies and Python packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
-    && pip install --no-cache-dir pip-tools \
-    && pip install --no-cache-dir fastapi>=0.115.5 pydantic>=2.9.2 sqlalchemy>=2.0.36 uvicorn>=0.32.0 \
+    && pip install -r requirements.txt\
     && apt-get purge -y --auto-remove build-essential \
     && rm -rf /var/lib/apt/lists/*
 

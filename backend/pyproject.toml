@@ -12,5 +12,6 @@ dependencies = [
     "python-jose[cryptography]",
     "passlib[bcrypt]",
     "python-multipart",
-    "python-dotenv"
+    "python-dotenv",
+    "jose>=1.0.0",
 ]
