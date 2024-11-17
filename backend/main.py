@@ -23,8 +23,12 @@ app = FastAPI(title="Daily Journal App")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000", "https://journal.zhuhome.work",
-        "https://www.journal.zhuhome.work"
+        "http://localhost:11302",
+        "http://localhost:3000",
+        "https://journal.zhuhome.work",
+        "https://www.journal.zhuhome.work",
+        "https://myjournal.zhuhome.work",
+        "https://www.myjournal.zhuhome.work",
     ],
     allow_credentials=True,
     allow_methods=["*"],

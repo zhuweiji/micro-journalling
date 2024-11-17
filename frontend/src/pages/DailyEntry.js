@@ -14,7 +14,7 @@ function DailyEntry() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${REACT_APP_API_URL}}/entries/`, {
+      await axios.post(`${REACT_APP_API_URL}/entries/`, {
         content,
         mood
       });
