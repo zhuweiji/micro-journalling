@@ -7,7 +7,8 @@ import {
   startOfWeek,
   endOfWeek,
   addWeeks,
-  subWeeks
+  subWeeks,
+  lastDayOfMonth
 } from 'date-fns';
 import MonthView from '../components/calendar/MonthView';
 import WeekView from '../components/calendar/WeekView';
@@ -47,9 +48,14 @@ function CalendarView() {
 
   const getDaysToRender = () => {
     if (viewMode === 'month') {
+      const monthStart = startOfMonth(currentDate);
+      const monthEnd = endOfMonth(currentDate);
+      const calendarStart = startOfWeek(monthStart);
+      const calendarEnd = endOfWeek(monthEnd);
+
       return eachDayOfInterval({
-        start: startOfMonth(currentDate),
-        end: endOfMonth(currentDate)
+        start: calendarStart,
+        end: calendarEnd
       });
     } else {
       return eachDayOfInterval({
