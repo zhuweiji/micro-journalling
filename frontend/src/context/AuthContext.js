@@ -21,9 +21,26 @@ export const AuthProvider = ({ children }) => {
         return {
             token: storedToken,
             user: storedUser ? JSON.parse(storedUser) : null,
-            isAuthenticated: !!storedToken
+            isAuthenticated: false  // Start with false until we verify the token
         };
     });
+
+    // Verify token on mount
+    useEffect(() => {
+        const verifyToken = async () => {
+            const token = localStorage.getItem('token');
+            if (token) {
+                try {
+                    await api.get('/users/me');  // This will use the token to verify if it's still valid
+                    setAuth(prev => ({ ...prev, isAuthenticated: true }));
+                } catch (error) {
+                    // If verification fails, clear everything
+                    logout();
+                }
+            }
+        };
+        verifyToken();
+    }, []);
 
     const login = async (username, password) => {
         try {

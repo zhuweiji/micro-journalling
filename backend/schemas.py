@@ -1,6 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from datetime import datetime
 from typing import Optional, List, Union
+from utils import to_local_time, to_utc
 
 class JournalEntryBase(BaseModel):
     """
@@ -8,6 +9,14 @@ class JournalEntryBase(BaseModel):
     """
     content: str
     mood: Optional[str] = None
+    created_at: Optional[datetime] = None
+
+    @validator('created_at')
+    def ensure_timezone(cls, v):
+        if v is not None and v.tzinfo is None:
+            # If no timezone is provided, assume it's in local time (UTC+8)
+            return to_utc(v)
+        return v
 
 class JournalEntryCreate(JournalEntryBase):
     """
@@ -24,6 +33,9 @@ class JournalEntry(JournalEntryBase):
 
     class Config:
         orm_mode = True
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
 
 class PaginatedJournalEntries(BaseModel):
     """

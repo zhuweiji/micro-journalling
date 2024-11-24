@@ -3,6 +3,8 @@ import { format } from 'date-fns';
 import toast, { Toaster } from 'react-hot-toast';
 import { FaEdit, FaTrash } from 'react-icons/fa';
 import { api } from '../context/AuthContext';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
 
 const MoodEmoji = ({ mood }) => {
   const emojis = {
@@ -64,7 +66,8 @@ function EntryList() {
     try {
       await api.put(`/entries/${editingEntry.id}`, {
         content: editingEntry.content,
-        mood: editingEntry.mood
+        mood: editingEntry.mood,
+        created_at: editingEntry.created_at
       });
 
       setEntries(entries.map(entry =>
@@ -130,6 +133,16 @@ function EntryList() {
                       <option value="excited">Excited 🎉</option>
                       <option value="stressed">Stressed 😓</option>
                     </select>
+                    <div className="mt-4">
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Entry Date</label>
+                      <DatePicker
+                        selected={new Date(editingEntry.created_at)}
+                        onChange={(date) => setEditingEntry({ ...editingEntry, created_at: date.toISOString() })}
+                        showTimeSelect
+                        dateFormat="MMMM d, yyyy h:mm aa"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      />
+                    </div>
                     <div className="flex justify-end space-x-2 mt-4">
                       <button
                         onClick={() => setEditingEntry(null)}
