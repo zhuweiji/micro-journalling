@@ -3,10 +3,13 @@ import toast, { Toaster } from 'react-hot-toast';
 import useWindowSize from 'react-use/lib/useWindowSize';
 import Confetti from 'react-confetti';
 import { api } from '../context/AuthContext';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
 
 function DailyEntry() {
   const [content, setContent] = useState('');
   const [mood, setMood] = useState('');
+  const [entryDate, setEntryDate] = useState(new Date());
   const [showConfetti, setShowConfetti] = useState(false);
   const { width, height } = useWindowSize();
 
@@ -15,12 +18,14 @@ function DailyEntry() {
     try {
       await api.post(`/entries/`, {
         content,
-        mood
+        mood,
+        created_at: entryDate.toISOString()
       });
 
       // Reset form
       setContent('');
       setMood('');
+      setEntryDate(new Date());
 
       // Show success toast and confetti
       toast.success('Journal entry saved! 📝', {
@@ -72,6 +77,23 @@ function DailyEntry() {
           Today's Journal Entry
         </h1>
         <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label
+              htmlFor="entryDate"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
+              Entry Date
+            </label>
+            <DatePicker
+              id="entryDate"
+              selected={entryDate}
+              onChange={(date) => setEntryDate(date)}
+              showTimeSelect
+              dateFormat="MMMM d, yyyy h:mm aa"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
           <div>
             <label
               htmlFor="content"
